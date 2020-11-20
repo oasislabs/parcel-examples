@@ -1,0 +1,15 @@
+{
+    "private": true,
+    "name": "@oasislabs/parcel-examples-account-linking",
+    "version": "0.5.0",
+    "description": "",
+    "main": "public/index.html",
+    "scripts": {
+        "start": "serve -l 4050"
+    },
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "serve": "^11.3.0"
+    }
+}

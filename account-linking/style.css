@@ -1,0 +1,58 @@
+html {
+  background: url("brooke-lark-08bOYnH_r_E-unsplash.jpg") no-repeat center
+    center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+body {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    " . main"
+    "footer footer";
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 60px 1fr 60px;
+  margin: 0px;
+  min-height: 100vh;
+}
+
+p {
+  padding: 4px;
+  max-width: 400px;
+}
+
+button {
+  min-width: 180px;
+  min-height: 36px;
+  margin: 8px;
+  border-radius: 4px;
+}
+
+.credit {
+  bottom: 8px;
+  position: fixed;
+  margin-left: 8px;
+  margin-bottom: 0px;
+}
+
+.footer {
+  grid-area: footer;
+}
+
+.main {
+  grid-area: main;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+#response {
+  border-radius: 4px;
+  width: 420px;
+  height: 240px;
+}

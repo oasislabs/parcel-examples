@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>My Recipe App</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/gh/IdentityModel/oidc-client-js@1.10.1/dist/oidc-client.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/auth0/jwt-decode@2.2.0/build/jwt-decode.js"></script>
+    <link rel="stylesheet" type="text/css" href="../style.css" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+  </head>
+  <body>
+    <div class="main">
+      <div id="response">
+        <h2>Welcome to All My Chard</h2>
+        <!-- #region snippet-show -->
+        <span>Your user id is</span>
+        <button id="user-id" data-cy="user-id"></button>
+        <!-- #endregion snippet-show -->
+        <button id="grant-access-oasis" data-cy="grant-access-oasis">
+          I want to share my recipes!
+        </button>
+      </div>
+    </div>
+    <div class="footer">
+      <p class="credit">Photo by Brooke Lark on Unsplash</p>
+    </div>
+    <!-- #region snippet-receive -->
+    <script src="config.js" type="text/javascript"></script>
+    <script>
+      Oidc.Log.logger = console;
+      Oidc.Log.level = Oidc.Log.DEBUG;
+      const oidcClient = new Oidc.OidcClient(config);
+      (async function() {
+        try {
+          const response = await oidcClient.processSigninResponse(location.href);
+          const IDToken = response.id_token;
+          const decoded = jwt_decode(IDToken);
+          const address = decoded.sub;
+          console.log(`ID token:\n${JSON.stringify(decoded, null, '')}`);
+          document.getElementById('user-id').innerText = `${address}`;
+          document.getElementById('grant-access-oasis').addEventListener('click', function () {
+            location.assign(grantUrl(address));
+          });
+        } catch (error) {
+          document.getElementById('user-id').hidden = true;
+          document.getElementById('grant-access-oasis').hidden = true;
+          document.getElementById('response').innerText = `${error}`;
+        }
+      })();
+    </script>
+    <!-- #endregion snippet-receive -->
+  </body>
+</html>

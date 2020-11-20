@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>My Recipe App</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/gh/IdentityModel/oidc-client-js@1.10.1/dist/oidc-client.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/auth0/jwt-decode@2.2.0/build/jwt-decode.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico" />
+  </head>
+  <body>
+    <div class="main">
+      <div class="sign-up">
+        <h1>Welcome to All My Chard</h1>
+        <h3>The world's leading privacy-first recipe management tool</h3>
+        <h4><i>Built by ACME Co.</i></h4>
+        <br />
+        <!-- #region snippet-context -->
+        <h2>Data Privacy</h2>
+        <p>
+          Here at ACME, your privacy is very important to us. We've partned with
+          Oasis Labs so you can own your recipe data from our app.
+        </p>
+        <p>To set up your Oasis account, click Get Started</p>
+        <button onclick="obtainIdToken()" data-cy="sign-up-oasis">
+          Get started with Oasis
+        </button>
+        <button>Maybe later</button>
+        <!-- #endregion snippet-context -->
+      </div>
+    </div>
+    <div class="footer">
+      <p class="credit">Photo by Brooke Lark on Unsplash</p>
+    </div>
+    <!-- #region snippet-start -->
+    <script src="config.js" type="text/javascript"></script>
+    <script>
+      Oidc.Log.logger = console;
+      Oidc.Log.level = Oidc.Log.DEBUG;
+      const oidcClient = new Oidc.OidcClient(config);
+      async function obtainIdToken() {
+        const request = await oidcClient.createSigninRequest();
+        location.assign(request.url);
+      }
+    </script>
+    <!-- #endregion snippet-start -->
+  </body>
+</html>

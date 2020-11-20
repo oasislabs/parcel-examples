@@ -1,0 +1,17 @@
+{
+    "include": ["src"],
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "checkJs": true,
+        "esModuleInterop": true,
+        "importHelpers": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "bin/",
+        "skipLibCheck": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "target": "es6"
+    }
+}
