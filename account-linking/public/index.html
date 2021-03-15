@@ -20,11 +20,12 @@
         <!-- #region snippet-context -->
         <h2>Data Privacy</h2>
         <p>
-          Here at ACME, your privacy is very important to us. We've partned with
-          Oasis Labs so you can own your recipe data from our app.
+          Here at ACME ltd., your privacy is very important to us. We've
+          partnered with Oasis Labs so you can own your recipe data from our
+          app.
         </p>
         <p>To set up your Oasis account, click Get Started</p>
-        <button onclick="obtainIdToken()" data-cy="sign-up-oasis">
+        <button onclick="oidcClient.signinRedirect()" data-cy="sign-up-oasis">
           Get started with Oasis
         </button>
         <button>Maybe later</button>
@@ -35,15 +36,12 @@
       <p class="credit">Photo by Brooke Lark on Unsplash</p>
     </div>
     <!-- #region snippet-start -->
-    <script src="config.js" type="text/javascript"></script>
+    <script src="/getOidcConfig" type="text/javascript"></script>
     <script>
       Oidc.Log.logger = console;
       Oidc.Log.level = Oidc.Log.DEBUG;
-      const oidcClient = new Oidc.OidcClient(config);
-      async function obtainIdToken() {
-        const request = await oidcClient.createSigninRequest();
-        location.assign(request.url);
-      }
+      console.log(oidcConfig)
+      const oidcClient = new Oidc.UserManager(oidcConfig);
     </script>
     <!-- #endregion snippet-start -->
   </body>

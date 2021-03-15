@@ -1,0 +1,4 @@
+# Compiled javascript.
+bin/
+# Example-specific files.
+output_document

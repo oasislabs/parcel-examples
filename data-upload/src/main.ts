@@ -1,64 +1,57 @@
-// #region snippet-config
-import * as Parcel from '@oasislabs/parcel-sdk';
+import Parcel, { Document } from '@oasislabs/parcel';
 
-const configParams = Parcel.Config.paramsFromEnv();
-const config = new Parcel.Config(configParams);
-// #endregion snippet-config
+import * as fs from 'fs';
 
-async function main() {
-    // #region snippet-connect
-    // Find the identity address associated with the private key you supplied
-    // above.
-    const identityAddress = Parcel.Identity.addressFromToken(await config.tokenProvider.getToken());
+// #region snippet-configuration
+const apiCreds = {
+  // Client ID
+  clientId: 'C92EAFfH67w4bGkVMjihvkQ',
+  // Client key
+  privateKey: {
+    // Note: Make sure kid matches the one you added in portal.
+    kid: 'example-client-1',
+    use: 'sig',
+    kty: 'EC',
+    crv: 'P-256',
+    alg: 'ES256',
+    x: 'ej4slEdbZpwYG-4T-WfLHpMBWPf6FItNNGFEHsjdyK4',
+    y: 'e4Q4ygapmkxku_olSuc-WhSJaWiNCvuPqIWaOV6P9pE',
+    d: '_X2VJCigbOYXOq0ilXATJdh9c2DdaSzZlxXVV6yuCXg',
+  },
+} as const;
+// #endregion snippet-configuration
 
-    // Let's connect to the identity.
-    const identity = await Parcel.Identity.connect(identityAddress, config);
-    console.log(`Connected to identity at address ${identity.address.hex}`);
-    // #endregion snippet-connect
+// #region snippet-connect
+const parcel = new Parcel(apiCreds);
+// #endregion snippet-connect
 
-    // #region snippet-dataset-upload
-    // Now let's upload a dataset.
-    const datasetMetadata = {
-        title: 'My First Dataset',
-        // A (fake) example metadata URL.
-        metadataUrl: 'http://s3-us-west-2.amazonaws.com/my_first_metadata.json',
-    };
-
-    // The dataset: 'hooray!', encoded as a Uint8Array.
-    const data = new TextEncoder().encode('hooray!');
-    console.log('Uploading data for our user');
-    const dataset = await Parcel.Dataset.upload(data, datasetMetadata, identity, config);
-    // `dataset.address.hex` is your dataset's unique ID.
-    console.log(
-        `Created dataset with address ${dataset.address.hex} and uploaded to ${dataset.metadata.dataUrl}`,
-    );
-    // #endregion snippet-dataset-upload
-
-    // #region snippet-dataset-download
-    // By default, the dataset owner can download the data.
-    const datasetToDownload = await Parcel.Dataset.connect(dataset.address, identity, config);
-    console.log(`Connected to dataset ${datasetToDownload.address.hex}`);
-    const secretDataStream = datasetToDownload.download();
-    const secretDatasetWriter = secretDataStream.pipe(
-        require('fs').createWriteStream('./user_data'),
-    );
-
-    // Utility method.
-    const streamFinished = require('util').promisify(require('stream').finished);
-    try {
-        await streamFinished(secretDatasetWriter);
-        console.log(`Dataset ${datasetToDownload.address.hex} has been downloaded to ./user_data`);
-    } catch (e) {
-        throw new Error(`Failed to download dataset at ${datasetToDownload.address.hex}`);
-    }
-    const secretData = require('fs').readFileSync('./user_data').toString();
-    console.log(`Hey dataset owner! Here's your data: ${secretData}\n`);
-    // #endregion snippet-dataset-download
+// #region snippet-document-upload
+const data = 'Hello private world!';
+const documentDetails = { title: 'My first document', tags: ['greeting', 'english'] };
+let document: Document;
+try {
+  document = await parcel.uploadDocument(data, { details: documentDetails }).finished;
+} catch (error: any) {
+  console.error('Failed to upload document');
+  throw error;
 }
 
-main()
-    .then(() => console.log('All done!'))
-    .catch((err) => {
-        console.log(`Error in main(): ${err.stack || JSON.stringify(err)}`);
-        process.exitCode = 1;
-    });
+console.log(`Created document ${document.id} with title ${document.details.title}`);
+// #endregion snippet-document-upload
+
+// #region snippet-document-download
+// Let's download the above document using its ID.
+// By default, the document owner can download the data.
+const download = parcel.downloadDocument(document.id);
+const saver = fs.createWriteStream(`./user_data`);
+try {
+  await download.pipeTo(saver);
+  console.log(`Document ${document.id} has been downloaded to ./user_data`);
+} catch (error: any) {
+  console.error(`Failed to download document ${document.id}`);
+  throw error;
+}
+
+const secretData = fs.readFileSync('./user_data', 'utf-8');
+console.log(`Hey document owner! Here's your data: ${secretData}\n`);
+// #endregion snippet-document-download
