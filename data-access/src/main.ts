@@ -1,135 +1,96 @@
-import * as Parcel from '@oasislabs/parcel-sdk';
+import Parcel, { IdentityId } from '@oasislabs/parcel';
+import fs from 'fs';
 
-// #region snippet-config-alice
-const aliceConfig = new Parcel.Config(Parcel.Config.paramsFromEnv());
-// #endregion snippet-config-alice
+// #region snippet-config
+const tokenSource = {
+  clientId: 'C92EAFfH67w4bGkVMjihvkQ',
+  privateKey: {
+    kid: 'example-client-1',
+    kty: 'EC',
+    alg: 'ES256',
+    use: 'sig',
+    crv: 'P-256',
+    x: 'ej4slEdbZpwYG-4T-WfLHpMBWPf6FItNNGFEHsjdyK4',
+    y: 'e4Q4ygapmkxku_olSuc-WhSJaWiNCvuPqIWaOV6P9pE',
+    d: '_X2VJCigbOYXOq0ilXATJdh9c2DdaSzZlxXVV6yuCXg',
+  },
+} as const;
+// #endregion snippet-config
 
-const params = Parcel.Config.paramsFromEnv();
-params.apiTokenSigner.clientId = process.env.OASIS_CLIENT_ID2;
-params.apiTokenSigner.privateKey = process.env.OASIS_API_PRIVATE_KEY2;
-const bobConfig = new Parcel.Config(params);
+// #region snippet-identity-acme-connect
+// Connect to ACME's identity.
+const parcel = new Parcel(tokenSource);
+// #endregion snippet-identity-acme-connect
 
-async function main() {
-    // #region snippet-identity-alice
-    const aliceIdentityAddress = Parcel.Identity.addressFromToken(
-        await aliceConfig.tokenProvider.getToken(),
-    );
-    // #endregion snippet-identity-alice
+// By default, documents are owned by the uploading identity
+// #region snippet-upload-default-owner
+const acmeIdentity = await parcel.getCurrentIdentity();
+console.log(`Uploading data with identity: ${acmeIdentity.id}`);
 
-    const bobIdentityAddress = Parcel.Identity.addressFromToken(
-        await bobConfig.tokenProvider.getToken(),
-    );
+const data = 'The weather will be sunny tomorrow and cloudy on Tuesday.';
+const documentDetails = { title: 'Weather forecast summary', tags: ['english'] };
+const acmeDocument = await parcel.uploadDocument(data, {
+  details: documentDetails,
+}).finished;
+console.log(`Created document ${acmeDocument.id} with owner ${acmeDocument.owner}`);
+// #endregion snippet-upload-default-owner
 
-    // #region snippet-identity-alice-connect
-    // Let's connect to Alice's identity.
-    const aliceIdentity = await Parcel.Identity.connect(aliceIdentityAddress, aliceConfig);
-    console.log(`Connected to Alice's identity at address ${aliceIdentity.address.hex}`);
-    // #endregion snippet-identity-alice-connect
+// Document owners can always download their data
+// #region snippet-download-owner
+console.log(`Downloading document ${acmeDocument.id} with identity ${acmeIdentity.id}`);
+let download = parcel.downloadDocument(acmeDocument.id);
+let saver = fs.createWriteStream(`./acme_document`);
+await download.pipeTo(saver);
+console.log(`Document ${acmeDocument.id} downloaded to ./acme_document`);
 
-    // #region snippet-upload
-    // Now let's upload a dataset for Bob.
-    const datasetMetadata = {
-        title: "Bob's Dataset",
-        // A (fake) example metadata URL.
-        metadataUrl: 'http://s3-us-west-2.amazonaws.com/my_first_metadata.json',
-    };
-    const data = new TextEncoder().encode('The weather will be sunny tomorrow.');
-    console.log('Uploading data for Bob');
-    const dataset = await Parcel.Dataset.upload(
-        data,
-        datasetMetadata,
-        // The dataset is uploaded for Bob...
-        await Parcel.Identity.connect(bobIdentityAddress, aliceConfig),
-        // ...with Alice's credentials being used to do the upload...
-        aliceConfig,
-        {
-            // ...and Alice is flagged as the dataset's creator.
-            creator: aliceIdentity,
-        },
-    );
-    console.log(
-        `Created dataset with address ${dataset.address.hex} and uploaded to ${dataset.metadata.dataUrl}\n`,
-    );
-    // #endregion snippet-upload
+const acmeData = fs.readFileSync('./acme_document', 'utf-8');
+console.log(`Here's the data: ${acmeData}`);
+// #endregion snippet-download-owner
 
-    // #region snippet-download-alice-error
-    // Let's try to download this data. We shouldn't be able to, since we
-    // uploaded it with Bob as its owner.
-    let datasetByAlice = await Parcel.Dataset.connect(dataset.address, aliceIdentity, aliceConfig);
+// Upload a document and assign ownership to a sample end user (e.g. "Bob")
+// #region snippet-upload-user-data
+const bobId = 'IJ5kvpUafgext6vuCuCH36L' as IdentityId; // REPLACE ME
+const appId = 'AVNidsM1HR76CFTJvGrrTrd'; // REPLACE ME
+documentDetails.tags.push(appId);
+console.log(`Uploading data for end user Bob (ID: ${bobId}) for your app (ID: ${appId})`);
+const bobDocument = await parcel.uploadDocument(data, {
+  details: documentDetails,
+  owner: bobId,
+}).finished;
+console.log(`Created document ${bobDocument.id} with owner ${bobDocument.owner}`);
+// #endregion snippet-upload-user-data
 
-    try {
-        console.log(`Attempting to access Bob's data without permission...`);
-        await new Promise((resolve, reject) => {
-            const decryptedStream = datasetByAlice.download();
-            decryptedStream.on('error', reject);
-            decryptedStream.on('end', resolve);
-        });
-        throw new Error('This should not happen.');
-    } catch (e) {
-        // this is expected
-        console.log(`Error: ${e.constructor.name}`);
-        console.log("`aliceIdentity` was not able to access Bob's data (expected).\n");
-    }
-    // #endregion snippet-download-alice-error
-
-    // #region snippet-download-bob-success
-    // Create Bob's identity using API access token.
-    const bobIdentity = await Parcel.Identity.connect(bobIdentityAddress, bobConfig);
-    console.log(`Connected to Bob's identity at address ${bobIdentity.address.hex}`);
-
-    // Now let's try to download it again, this time as Bob.
-    const datasetByBob = await Parcel.Dataset.connect(dataset.address, bobIdentity, bobConfig);
-    const streamFinished = require('util').promisify(require('stream').finished);
-    try {
-        const secretDataStream = datasetByBob.download();
-        const secretDatasetWriter = secretDataStream.pipe(
-            require('fs').createWriteStream('./bob_data_by_bob'),
-        );
-        await streamFinished(secretDatasetWriter);
-        console.log(
-            `\nDataset ${datasetByBob.address.hex} has been downloaded to ./bob_data_by_bob`,
-        );
-    } catch (e) {
-        throw new Error(`Failed to download dataset at ${datasetByBob.address.hex}`);
-    }
-    const secretDataByBob = require('fs').readFileSync('./bob_data_by_bob').toString();
-    console.log(`Here's the data: ${secretDataByBob}`);
-    // #endregion snippet-download-bob-success
-
-    // #region snippet-whitelist-policy
-    const policy = await Parcel.WhitelistPolicy.create(
-        bobConfig,
-        bobIdentity, // The policy creator, and subsequent owner.
-        new Parcel.Set([aliceIdentity.address]), // The set of whitelisted identities.
-    );
-    await datasetByBob.setPolicy(policy);
-    console.log(
-        `Created policy with address ${policy.address.hex} and applied it to dataset ${datasetByBob.address.hex}\n`,
-    );
-    // #endregion snippet-whitelist-policy
-
-    // #region snippet-download-alice-success
-    datasetByAlice = await Parcel.Dataset.connect(dataset.address, aliceIdentity, aliceConfig);
-    try {
-        const secretDataStream = datasetByAlice.download();
-        const secretDatasetWriter = secretDataStream.pipe(
-            require('fs').createWriteStream('./bob_data_by_alice'),
-        );
-        await streamFinished(secretDatasetWriter);
-        console.log(
-            `\nDataset ${datasetByAlice.address.hex} has been downloaded to ./bob_data_by_alice`,
-        );
-    } catch (e) {
-        throw new Error(`Failed to download dataset at ${datasetByAlice.address.hex}`);
-    }
-    const secretDataByAlice = require('fs').readFileSync('./bob_data_by_alice').toString();
-    console.log(`Here's the data: ${secretDataByAlice}`);
-    // #endregion snippet-download-alice-success
+// By default, we do not have permission to access data owned by other users
+// #region snippet-download-acme-error
+download = parcel.downloadDocument(bobDocument.id);
+saver = fs.createWriteStream(`./bob_data_by_acme`);
+try {
+  console.log(`Attempting to access Bob's document without permission...`);
+  await download.pipeTo(saver);
+} catch (error: any) {
+  console.log(`ACME was not able to access Bob's data (this was expected): ${error}`);
 }
+// #endregion snippet-download-acme-error
 
-main()
-    .then(() => console.log('All done!'))
-    .catch((err) => {
-        console.log(`Error in main(): ${err.stack || JSON.stringify(err)}`);
-        process.exitCode = 1;
-    });
+console.log();
+
+/**
+ * At this point, we need Bob to grant us permission to use his data.
+ * Specifically, we need to:
+ *  - Redirect Bob to steward.oasislabs.com/apps/:id/join
+ *  - Have Bob grant us permission
+ */
+
+// Now, accessing the document succeeds
+// #region snippet-download-bob-success
+console.log(`Attempting to access Bob's document with ACME identity ${acmeIdentity.id}`);
+download = parcel.downloadDocument(bobDocument.id);
+saver = fs.createWriteStream(`./bob_data_by_acme`);
+await download.pipeTo(saver);
+console.log(`Document ${bobDocument.id} has been downloaded to ./bob_data_by_acme`);
+
+const bobData = fs.readFileSync('./bob_data_by_acme', 'utf-8');
+console.log(`Here's the data: ${bobData}`);
+// #endregion snippet-download-bob-success
+
+console.log();

@@ -1,6 +1,0 @@
-*.rs.bk
-dist/
-target/
-.oasis/
-*/bin/*.js
-*/yarn.lock
