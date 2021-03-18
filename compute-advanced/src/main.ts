@@ -4,7 +4,7 @@ import fs from 'fs';
 const tokenSourceAcme = {
   clientId: 'C92EAFfH67w4bGkVMjihvkQ',
   privateKey: {
-    kid: 'example-client-1',
+    kid: 'acme-client',
     use: 'sig',
     kty: 'EC',
     crv: 'P-256',

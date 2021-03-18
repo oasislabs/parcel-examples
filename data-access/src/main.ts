@@ -5,7 +5,7 @@ import fs from 'fs';
 const tokenSource = {
   clientId: 'C92EAFfH67w4bGkVMjihvkQ',
   privateKey: {
-    kid: 'example-client-1',
+    kid: 'acme-client',
     kty: 'EC',
     alg: 'ES256',
     use: 'sig',
@@ -49,8 +49,8 @@ console.log(`Here's the data: ${acmeData}`);
 
 // Upload a document and assign ownership to a sample end user (e.g. "Bob")
 // #region snippet-upload-user-data
-const bobId = 'IJ5kvpUafgext6vuCuCH36L' as IdentityId; // REPLACE ME
-const appId = 'AVNidsM1HR76CFTJvGrrTrd'; // REPLACE ME
+const bobId = 'I32QuMCAFRuKmY3QTH2awAC' as IdentityId; // REPLACE ME
+const appId = 'AVTnpB3U5g4o1TbRUNAG7YQ'; // REPLACE ME
 documentDetails.tags.push(appId);
 console.log(`Uploading data for end user Bob (ID: ${bobId}) for your app (ID: ${appId})`);
 const bobDocument = await parcel.uploadDocument(data, {
@@ -72,8 +72,6 @@ try {
 }
 // #endregion snippet-download-acme-error
 
-console.log();
-
 /**
  * At this point, we need Bob to grant us permission to use his data.
  * Specifically, we need to:
@@ -81,16 +79,25 @@ console.log();
  *  - Have Bob grant us permission
  */
 
-// Now, accessing the document succeeds
-// #region snippet-download-bob-success
-console.log(`Attempting to access Bob's document with ACME identity ${acmeIdentity.id}`);
-download = parcel.downloadDocument(bobDocument.id);
-saver = fs.createWriteStream(`./bob_data_by_acme`);
-await download.pipeTo(saver);
-console.log(`Document ${bobDocument.id} has been downloaded to ./bob_data_by_acme`);
-
-const bobData = fs.readFileSync('./bob_data_by_acme', 'utf-8');
-console.log(`Here's the data: ${bobData}`);
-// #endregion snippet-download-bob-success
+// Periodically check, if the access was granted.
+while (true) {
+  try {
+    // #region snippet-download-bob-success
+    console.log(`Attempting to access Bob's document with ACME identity ${acmeIdentity.id}`);
+    download = parcel.downloadDocument(bobDocument.id);
+    saver = fs.createWriteStream(`./bob_data_by_acme`);
+    await download.pipeTo(saver);
+    console.log(`Document ${bobDocument.id} has been downloaded to ./bob_data_by_acme`);
+    const bobData = fs.readFileSync('./bob_data_by_acme', 'utf-8');
+    console.log(`Here's the data: ${bobData}`);
+    // #endregion snippet-download-bob-success
+    break;
+  } catch {
+    console.log("No permission to access Bob's document yet. Retrying in 2s...");
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000);
+    });
+  }
+}
 
 console.log();

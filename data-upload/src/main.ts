@@ -9,7 +9,7 @@ const apiCreds = {
   // Client key
   privateKey: {
     // Note: Make sure kid matches the one you added in portal.
-    kid: 'example-client-1',
+    kid: 'acme-client',
     use: 'sig',
     kty: 'EC',
     crv: 'P-256',

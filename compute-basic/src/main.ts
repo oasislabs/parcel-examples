@@ -2,11 +2,11 @@ import Parcel, { IdentityId, Job, JobSpec, JobPhase } from '@oasislabs/parcel';
 import fs from 'fs';
 
 // #region snippet-configuration
-const acmeId = 'ISmEcSerfVhSspezb44dwLD' as IdentityId;
+const acmeId = 'IJ2UnsgTss9GZw2EXKXagmj' as IdentityId;
 const tokenSourceAcme = {
   clientId: 'C92EAFfH67w4bGkVMjihvkQ',
   privateKey: {
-    kid: 'example-client-1',
+    kid: 'acme-client',
     use: 'sig',
     kty: 'EC',
     crv: 'P-256',
@@ -24,7 +24,7 @@ const tokenSourceAcme = {
 const tokenSourceBob = {
   clientId: 'CErM9iRkfYdAJ9TCbJvV3gQ',
   privateKey: {
-    kid: 'example-client-2',
+    kid: 'bob-client',
     kty: 'EC',
     alg: 'ES256',
     use: 'sig',
@@ -48,7 +48,7 @@ const recipeDocument = await parcelBob.uploadDocument(
 ).finished;
 await parcelBob.createGrant({
   grantee: acmeId,
-  conditions: { 'document.id': { $eq: recipeDocument.id } },
+  condition: { 'document.id': { $eq: recipeDocument.id } },
 });
 // #endregion snippet-input-documents
 
