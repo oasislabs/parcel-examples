@@ -1,9 +1,8 @@
 {
     "include": ["src"],
     "compilerOptions": {
-        "allowJs": true,
-        "checkJs": true,
         "esModuleInterop": true,
+        "lib": ["esnext", "dom"],
         "module": "esnext",
         "moduleResolution": "node",
         "outDir": "bin/",

@@ -1,11 +1,10 @@
 {
     "include": ["src"],
     "compilerOptions": {
-        "allowJs": true,
-        "checkJs": true,
         "esModuleInterop": true,
-        "moduleResolution": "node",
+        "lib": ["esnext", "dom"],
         "module": "esnext",
+        "moduleResolution": "node",
         "outDir": "bin/",
         "strict": true,
         "target": "es2018"
