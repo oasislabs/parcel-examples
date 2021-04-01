@@ -25,7 +25,7 @@ const acmeId = (await parcelAcme.getCurrentIdentity()).id;
 // #region snippet-input-documents
 const skinDocument = await parcelAcme.uploadDocument(
   await fs.promises.readFile('docker/test_workdir/data/in/basal_cell_carcinoma_example.jpg'),
-  { details: { title: 'User-provided skin image' } },
+  { details: { title: 'User-provided skin image' }, toApp: undefined },
 ).finished;
 // #endregion snippet-input-documents
 console.log('Documents uploaded.');

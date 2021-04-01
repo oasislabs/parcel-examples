@@ -30,7 +30,8 @@ const data = 'Hello private world!';
 const documentDetails = { title: 'My first document', tags: ['greeting', 'english'] };
 let document: Document;
 try {
-  document = await parcel.uploadDocument(data, { details: documentDetails }).finished;
+  document = await parcel.uploadDocument(data, { details: documentDetails, toApp: undefined })
+    .finished;
 } catch (error: any) {
   console.error('Failed to upload document');
   throw error;

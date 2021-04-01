@@ -45,6 +45,7 @@ const bobId = (await parcelBob.getCurrentIdentity()).id;
 console.log('Uploading input document as Bob.');
 const recipeDocument = await parcelBob.uploadDocument(
   Buffer.from('14g butter; 15g chicken sausage; 18g feta; 20g green pepper; 1.5min baking'),
+  { toApp: undefined },
 ).finished;
 await parcelBob.createGrant({
   grantee: acmeId,

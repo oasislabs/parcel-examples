@@ -1,4 +1,4 @@
-import Parcel, { IdentityId } from '@oasislabs/parcel';
+import Parcel, { AppId, IdentityId } from '@oasislabs/parcel';
 import fs from 'fs';
 
 // #region snippet-config
@@ -31,6 +31,7 @@ const data = 'The weather will be sunny tomorrow and cloudy on Tuesday.';
 const documentDetails = { title: 'Weather forecast summary', tags: ['english'] };
 const acmeDocument = await parcel.uploadDocument(data, {
   details: documentDetails,
+  toApp: undefined,
 }).finished;
 console.log(`Created document ${acmeDocument.id} with owner ${acmeDocument.owner}`);
 // #endregion snippet-upload-default-owner
@@ -50,12 +51,12 @@ console.log(`Here's the data: ${acmeData}`);
 // Upload a document and assign ownership to a sample end user (e.g. "Bob")
 // #region snippet-upload-user-data
 const bobId = 'I32QuMCAFRuKmY3QTH2awAC' as IdentityId; // REPLACE ME
-const appId = 'AVTnpB3U5g4o1TbRUNAG7YQ'; // REPLACE ME
-documentDetails.tags.push(appId);
+const appId = 'AVTnpB3U5g4o1TbRUNAG7YQ' as AppId; // REPLACE ME
 console.log(`Uploading data for end user Bob (ID: ${bobId}) for your app (ID: ${appId})`);
 const bobDocument = await parcel.uploadDocument(data, {
   details: documentDetails,
   owner: bobId,
+  toApp: appId,
 }).finished;
 console.log(`Created document ${bobDocument.id} with owner ${bobDocument.owner}`);
 // #endregion snippet-upload-user-data

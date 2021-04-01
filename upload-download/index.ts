@@ -62,6 +62,7 @@ window.uploadDocument = async function () {
   const documentFile = documentPicker.files![0];
   const document = await parcel.uploadDocument(documentFile, {
     details: { title: documentName.value },
+    toApp: undefined,
   }).finished;
   addDocumentToList(document.id, document.details.title);
 };
