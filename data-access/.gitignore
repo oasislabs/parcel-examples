@@ -1,6 +1,7 @@
 # Compiled javascript.
 bin/
 # Example-specific files.
+acme_document
 bob_data_by_bob
 bob_data_by_acme
 bob_data_by_acme_with_tags

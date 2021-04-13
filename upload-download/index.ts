@@ -13,7 +13,8 @@ declare global {
 import Parcel, { DocumentId } from '../..';
 import streamSaver from 'streamsaver';
 
-import fixtureJWK from '../../../../../runtime/genesis/test_identity_creds.json';
+// @ts-expect-error
+import testFixture from '../../../../../integration/fixtures/kind.yaml';
 
 streamSaver.WritableStream = WritableStream;
 
@@ -31,7 +32,12 @@ const documentPicker: HTMLInputElement = $('#document-picker');
 const documentName: HTMLInputElement = $('#document-name');
 const documentsList = $('#uploaded-documents');
 
-apiCreds.value = JSON.stringify(fixtureJWK, null, 4);
+const fixtureIdentity = testFixture.identities[0];
+const fixtureApiCreds = {
+  principal: fixtureIdentity.id,
+  privateKey: fixtureIdentity.token_verifiers[0].private_key,
+};
+apiCreds.value = JSON.stringify(fixtureApiCreds, null, 4);
 
 let parcel: Parcel;
 

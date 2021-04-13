@@ -2,19 +2,18 @@ import express from 'express';
 import path from 'path';
 
 // #region snippet-oidc-config
-const AUTH_URL = process.env.AUTH_URL ?? 'https://auth.oasislabs.com';
-const AUTH_ISS = process.env.AUTH_ISS ?? AUTH_URL;
+const PARCEL_AUTH_URL = process.env.PARCEL_AUTH_URL ?? 'https://auth.oasislabs.com';
 
 const oidcConfig = {
-  authority: AUTH_URL,
+  authority: PARCEL_AUTH_URL,
   metadata: {
-    issuer: AUTH_ISS,
-    authorization_endpoint: AUTH_URL + '/oauth/authorize',
-    jwks_uri: AUTH_URL + '/oauth/keys',
-    token_endpoint: AUTH_URL + '/oauth/token',
+    issuer: PARCEL_AUTH_URL,
+    authorization_endpoint: PARCEL_AUTH_URL + '/oauth/authorize',
+    jwks_uri: PARCEL_AUTH_URL + '/.well-known/jwks.json',
+    token_endpoint: PARCEL_AUTH_URL + '/oauth/token',
   },
   // Replace with your app's front-end client ID.
-  client_id: 'CErM9iRkfYdAJ9TCbJvV3gQ', // Client 4.
+  client_id: process.env.ACME_FRONTEND_CLIENT_ID!,
   redirect_uri: 'http://localhost:4050/callback',
   response_type: 'code',
   scope: 'openid',
@@ -48,5 +47,5 @@ app.get('/getOidcConfig', (req: express.Request, res: express.Response) => {
 // #endregion snippet-finalize-login
 
 app.listen(port, () => {
-  console.log('Account linking app listening at http://localhost:%s', port);
+  console.log('Login with Oasis app listening at http://localhost:%s', port);
 });

@@ -4,12 +4,12 @@ import * as fs from 'fs';
 
 // #region snippet-configuration
 const apiCreds = {
-  // Client ID
-  clientId: 'C92EAFfH67w4bGkVMjihvkQ',
+  // Client ID. Replace this with your service client ID, e.g. "C92EAFfH67w4bGkVMjihvkQ"
+  clientId: process.env.ACME_SERVICE_CLIENT_ID!,
   // Client key
   privateKey: {
     // Note: Make sure kid matches the one you added in portal.
-    kid: 'acme-client',
+    kid: 'acme-service-client',
     use: 'sig',
     kty: 'EC',
     crv: 'P-256',

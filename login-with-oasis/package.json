@@ -3,7 +3,7 @@
   "name": "@oasislabs/parcel-examples-login-with-oasis",
   "version": "1.0.0",
   "main": "./src/server.ts",
-  "description": "Oasis Parcel Account linking example",
+  "description": "Oasis Parcel Login with Oasis example",
   "license": "MIT",
   "author": "Oasis Labs <feedback@oasislabs.com>",
   "type": "module",
@@ -15,7 +15,7 @@
     "start": "node bin/server.js"
   },
   "dependencies": {
-    "@oasislabs/parcel": "^0.1.10",
+    "@oasislabs/parcel": "^0.1.11",
     "express": "^4.17.1"
   },
   "devDependencies": {

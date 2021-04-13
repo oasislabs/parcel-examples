@@ -3,9 +3,9 @@ import fs from 'fs';
 
 // #region snippet-config
 const tokenSource = {
-  clientId: 'C92EAFfH67w4bGkVMjihvkQ',
+  clientId: process.env.ACME_SERVICE_CLIENT_ID!,
   privateKey: {
-    kid: 'acme-client',
+    kid: 'acme-service-client',
     kty: 'EC',
     alg: 'ES256',
     use: 'sig',
@@ -50,8 +50,8 @@ console.log(`Here's the data: ${acmeData}`);
 
 // Upload a document and assign ownership to a sample end user (e.g. "Bob")
 // #region snippet-upload-user-data
-const bobId = 'I32QuMCAFRuKmY3QTH2awAC' as IdentityId; // REPLACE ME
-const appId = 'AVTnpB3U5g4o1TbRUNAG7YQ' as AppId; // REPLACE ME
+const bobId = process.env.BOB_IDENTITY_ID! as IdentityId; // REPLACE ME
+const appId = process.env.ACME_APP_ID! as AppId; // REPLACE ME
 console.log(`Uploading data for end user Bob (ID: ${bobId}) for your app (ID: ${appId})`);
 const bobDocument = await parcel.uploadDocument(data, {
   details: documentDetails,
