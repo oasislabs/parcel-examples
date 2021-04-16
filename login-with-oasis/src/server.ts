@@ -6,12 +6,6 @@ const PARCEL_AUTH_URL = process.env.PARCEL_AUTH_URL ?? 'https://auth.oasislabs.c
 
 const oidcConfig = {
   authority: PARCEL_AUTH_URL,
-  metadata: {
-    issuer: PARCEL_AUTH_URL,
-    authorization_endpoint: PARCEL_AUTH_URL + '/oauth/authorize',
-    jwks_uri: PARCEL_AUTH_URL + '/.well-known/jwks.json',
-    token_endpoint: PARCEL_AUTH_URL + '/oauth/token',
-  },
   // Replace with your app's front-end client ID.
   client_id: process.env.ACME_FRONTEND_CLIENT_ID!,
   redirect_uri: 'http://localhost:4050/callback',
