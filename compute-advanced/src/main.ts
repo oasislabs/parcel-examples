@@ -1,4 +1,4 @@
-import Parcel, { Job, JobSpec, JobPhase } from '@oasislabs/parcel';
+import Parcel, { JobPhase, JobSpec, JobStatusReport } from '@oasislabs/parcel';
 import fs from 'fs';
 
 const tokenSourceAcme = {
@@ -44,9 +44,9 @@ const jobId = (await parcelAcme.submitJob(jobSpec)).id;
 console.log(`Job ${jobId} submitted.`);
 
 // Wait for job completion.
-let job: Job;
+let job: JobStatusReport;
 do {
   await new Promise((resolve) => setTimeout(resolve, 5000)); // eslint-disable-line no-promise-executor-return
-  job = await parcelAcme.getJob(jobId);
+  job = await parcelAcme.getJobStatus(jobId);
   console.log(`Job status is ${JSON.stringify(job.status)}`);
 } while (job.status.phase === JobPhase.PENDING || job.status.phase === JobPhase.RUNNING);
