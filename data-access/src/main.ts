@@ -6,10 +6,10 @@ const tokenSource = {
   clientId: process.env.ACME_SERVICE_CLIENT_ID!,
   privateKey: {
     kid: 'acme-service-client',
-    kty: 'EC',
-    alg: 'ES256',
     use: 'sig',
+    kty: 'EC',
     crv: 'P-256',
+    alg: 'ES256',
     x: 'ej4slEdbZpwYG-4T-WfLHpMBWPf6FItNNGFEHsjdyK4',
     y: 'e4Q4ygapmkxku_olSuc-WhSJaWiNCvuPqIWaOV6P9pE',
     d: '_X2VJCigbOYXOq0ilXATJdh9c2DdaSzZlxXVV6yuCXg',

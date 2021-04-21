@@ -25,10 +25,10 @@ const tokenSourceBob = {
   clientId: process.env.BOB_SERVICE_CLIENT_ID!,
   privateKey: {
     kid: 'bob-service-client',
-    kty: 'EC',
-    alg: 'ES256',
     use: 'sig',
+    kty: 'EC',
     crv: 'P-256',
+    alg: 'ES256',
     x: 'kbhoJYKyOgY645Y9t-Vewwhke9ZRfLh6_TBevIA6SnQ',
     y: 'SEu0xuCzTH95-q_-FSZc-P6hCSnq6qH00MQ52vOVVpA',
     d: '10sS7lgM_YWxf79x21mWalCkAcZZOmX0ZRE_YwEXcmc',
