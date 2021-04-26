@@ -8,7 +8,7 @@
   "author": "Oasis Labs <feedback@oasislabs.com>",
   "type": "module",
   "engines": {
-    "node": ">=14.8"
+    "node": ">=14.13"
   },
   "scripts": {
     "prestart": "tsc -b",
