@@ -8,8 +8,6 @@ const apiCreds = {
   clientId: process.env.ACME_SERVICE_CLIENT_ID!,
   // Client key
   privateKey: {
-    // Note: Make sure kid matches the one you added in portal.
-    kid: 'acme-service-client',
     use: 'sig',
     kty: 'EC',
     crv: 'P-256',
