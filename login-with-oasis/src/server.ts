@@ -1,6 +1,9 @@
 import express from 'express';
 import path from 'path';
 
+const app = express();
+const port = 4050;
+
 // #region snippet-oidc-config
 const PARCEL_AUTH_URL = process.env.PARCEL_AUTH_URL ?? 'https://auth.oasislabs.com';
 
@@ -8,7 +11,7 @@ const oidcConfig = {
   authority: PARCEL_AUTH_URL,
   // Replace with your app's front-end client ID.
   client_id: process.env.ACME_FRONTEND_CLIENT_ID!,
-  redirect_uri: 'http://localhost:4050/callback',
+  redirect_uri: `http://localhost:${port}/callback`,
   response_type: 'code',
   scope: 'openid',
   filterProtocolClaims: false,
@@ -21,9 +24,6 @@ const oidcConfig = {
   },
 };
 // #endregion snippet-oidc-config
-
-const app = express();
-const port = 4050;
 
 app.use(express.static('public'));
 

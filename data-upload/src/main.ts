@@ -51,6 +51,6 @@ try {
   throw error;
 }
 
-const secretData = fs.readFileSync('./user_data', 'utf-8');
-console.log(`Hey document owner! Here's your data: ${secretData}\n`);
+const output = fs.readFileSync('./user_data', 'utf-8');
+console.log(`Hey document owner! Here's your data: ${output}\n`);
 // #endregion snippet-document-download

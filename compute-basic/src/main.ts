@@ -54,6 +54,20 @@ await parcelBob.createGrant({
 // #endregion snippet-input-documents
 
 // --- Run compute job as Acme.
+const parcelAcme = new Parcel(tokenSourceAcme);
+
+// #region snippet-successful-download
+const recipeDownload = parcelAcme.downloadDocument(recipeDocument.id);
+const recipeSaver = fs.createWriteStream(`./bob_data_by_acme`);
+try {
+  console.log(`Attempting to access Bob's document...`);
+  await recipeDownload.pipeTo(recipeSaver);
+  console.log('Successful download! (this was expected)');
+} catch (error: any) {
+  console.log(`ACME was not able to directly access Bob's data: ${error}`);
+}
+// #endregion snippet-successful-download
+
 // #region snippet-job-request
 // Define the job.
 const jobSpec: JobSpec = {
@@ -71,7 +85,6 @@ const jobSpec: JobSpec = {
 // #region snippet-job-submit-wait
 // Submit the job.
 console.log('Running the job as Acme.');
-const parcelAcme = new Parcel(tokenSourceAcme);
 const jobId = (await parcelAcme.submitJob(jobSpec)).id;
 
 // Wait for job to finish.
@@ -91,9 +104,9 @@ console.log(
 // does not have access to the output data.
 // #region snippet-job-output
 console.log('Downloading output document as Bob.');
-const download = parcelBob.downloadDocument(job.status.outputDocuments[0].id);
-const saver = fs.createWriteStream(`/tmp/output_document`);
-await download.pipeTo(saver);
-const outputDocument = fs.readFileSync('/tmp/output_document', 'utf-8');
-console.log(`Here's the computed result: "${outputDocument}"`);
+const outputDownload = parcelBob.downloadDocument(job.status.outputDocuments[0].id);
+const outputSaver = fs.createWriteStream(`/tmp/output_document`);
+await outputDownload.pipeTo(outputSaver);
+const output = fs.readFileSync('/tmp/output_document', 'utf-8');
+console.log(`Here's the computed result: "${output}"`);
 // #endregion snippet-job-output

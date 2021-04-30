@@ -1,6 +1,7 @@
-import Parcel, { AppId, JobPhase, JobSpec, JobStatusReport } from '@oasislabs/parcel';
+import Parcel, { AppId, JobSpec, JobStatusReport, JobPhase } from '@oasislabs/parcel';
 import fs from 'fs';
 
+// #region snippet-configuration
 const acmeId = process.env.ACME_APP_ID! as AppId;
 const tokenSourceAcme = {
   clientId: process.env.ACME_SERVICE_CLIENT_ID!,
@@ -33,6 +34,7 @@ const tokenSourceBob = {
     d: '10sS7lgM_YWxf79x21mWalCkAcZZOmX0ZRE_YwEXcmc',
   },
 } as const;
+// #endregion snippet-configuration
 
 // --- Upload data as Bob.
 const parcelBob = new Parcel(tokenSourceBob);
@@ -40,39 +42,54 @@ const bobId = (await parcelBob.getCurrentIdentity()).id;
 
 // Upload a documents and give Acme access to it.
 console.log('Uploading input document as Bob.');
-const skinDocument = await parcelBob.uploadDocument(
-  await fs.promises.readFile('docker/test_workdir/data/in/basal_cell_carcinoma_example.jpg'),
-  { details: { title: 'User-provided skin image' }, toApp: undefined },
+const recipeDocument = await parcelBob.uploadDocument(
+  Buffer.from('14g butter; 15g chicken sausage; 18g feta; 20g green pepper; 1.5min baking'),
+  { toApp: undefined },
 ).finished;
+
+// #region snippet-job-grant
 await parcelBob.createGrant({
   grantee: acmeId,
   condition: {
-    $and: [
-      { 'document.id': { $eq: skinDocument.id } },
-      { 'job.spec.image': { $eq: 'oasislabs/acme-derma-demo' } },
-    ],
+    $and: [{ 'document.id': { $eq: recipeDocument.id } }, { 'job.spec.image': { $eq: 'bash' } }],
   },
 });
-// #endregion snippet-input-documents
+// #endregion snippet-job-grant
 
 // --- Run compute job as Acme.
-// #region snippet-submit-job
+const parcelAcme = new Parcel(tokenSourceAcme);
+
+// #region snippet-failed-download
+const recipeDownload = parcelAcme.downloadDocument(recipeDocument.id);
+const recipeSaver = fs.createWriteStream(`./bob_data_by_acme`);
+try {
+  console.log(`Attempting to access Bob's document without permission...`);
+  await recipeDownload.pipeTo(recipeSaver);
+} catch (error: any) {
+  console.log(`ACME was not able to directly access Bob's data (this was expected): ${error}`);
+}
+// #endregion snippet-failed-download
+
+// #region snippet-job-request
 // Define the job.
 const jobSpec: JobSpec = {
-  name: 'skin-prediction',
-  image: 'oasislabs/acme-derma-demo',
-  inputDocuments: [{ mountPath: 'skin.jpg', id: skinDocument.id }],
-  outputDocuments: [{ mountPath: 'prediction.txt', owner: bobId }],
-  cmd: ['python', 'predict.py', '/parcel/data/in/skin.jpg', '/parcel/data/out/prediction.txt'],
+  name: 'word-count',
+  image: 'bash',
+  inputDocuments: [{ mountPath: 'recipe.txt', id: recipeDocument.id }],
+  outputDocuments: [{ mountPath: 'count.txt', owner: bobId }],
+  cmd: [
+    '-c',
+    'echo "Document has $(wc -w </parcel/data/in/recipe.txt) words" >/parcel/data/out/count.txt',
+  ],
 };
-// #endregion snippet-submit-job
+// #endregion snippet-job-request
 
+// #region snippet-job-submit-wait
 // Submit the job.
 console.log('Running the job as Acme.');
-const parcelAcme = new Parcel(tokenSourceAcme);
 const jobId = (await parcelAcme.submitJob(jobSpec)).id;
 
-// Wait for job completion.
+// Wait for job to finish.
 let job: JobStatusReport;
 do {
   await new Promise((resolve) => setTimeout(resolve, 5000)); // eslint-disable-line no-promise-executor-return
@@ -83,14 +100,15 @@ do {
 console.log(
   `Job ${jobId} completed with status ${job.status.phase} and ${job.status.outputDocuments.length} output document(s).`,
 );
+// #endregion snippet-job-submit-wait
 
 // Obtain compute job output -- again as Bob, because the computation was confidential and Acme
 // does not have access to the output data.
 // #region snippet-job-output
 console.log('Downloading output document as Bob.');
-const download = parcelBob.downloadDocument(job.status.outputDocuments[0].id);
-const saver = fs.createWriteStream(`/tmp/output_document`);
-await download.pipeTo(saver);
+const outputDownload = parcelBob.downloadDocument(job.status.outputDocuments[0].id);
+const outputSaver = fs.createWriteStream(`/tmp/output_document`);
+await outputDownload.pipeTo(outputSaver);
 const output = fs.readFileSync('/tmp/output_document', 'utf-8');
 console.log(`Here's the computed result: "${output}"`);
 // #endregion snippet-job-output

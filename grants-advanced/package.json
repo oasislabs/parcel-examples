@@ -1,14 +1,14 @@
 {
   "private": true,
-  "name": "@oasislabs/parcel-examples-compute-basic",
+  "name": "@oasislabs/parcel-examples-grants-advanced",
   "version": "1.0.0",
   "main": "./src/main.ts",
-  "description": "Oasis Parcel Compute basic example",
+  "description": "Oasis Parcel Grants advanced example",
   "license": "MIT",
   "author": "Oasis Labs <feedback@oasislabs.com>",
   "type": "module",
   "engines": {
-    "node": ">=14.13"
+    "node": ">=14.8"
   },
   "scripts": {
     "prestart": "tsc -b",
