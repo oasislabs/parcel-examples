@@ -2,20 +2,19 @@
 <html lang="en">
   <head>
     <script src="https://cdn.jsdelivr.net/gh/IdentityModel/oidc-client-js@1.10.1/dist/oidc-client.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/auth0/jwt-decode@2.2.0/build/jwt-decode.js"></script>
   </head>
   <body>
     <div class="main">
       <p>Verifying authorization token...</p>
       <!-- #region snippet-display -->
       <div id="result" hidden>
-        <span>Your user id is</span>
-        <button id="user-id" data-cy="user-id"></button>
+        <span>Your Parcel identity is</span>
+        <button id="parcel-id" data-cy="parcel-id"></button>
       </div>
       <!-- #endregion snippet-display -->
       <div id="error"></div>
     </div>
-    <!-- #region snippet-start -->
+    <!-- #region snippet-callback -->
     <script src="/getOidcConfig" type="text/javascript"></script>
     <script>
       Oidc.Log.logger = console;
@@ -24,11 +23,10 @@
       (async function () {
         try {
           const response = await oidcClient.processSigninResponse(location.href)
-          const IDToken = response.id_token;
-          const decoded = jwt_decode(IDToken);
-          const userId = decoded.sub;
-          console.log(`ID token:\n${JSON.stringify(decoded, null, '')}`);
-          document.getElementById('user-id').innerText = `${userId}`;
+          const idToken = response.profile;
+          console.log(`ID token:\n${JSON.stringify(idToken)}`);
+
+          document.getElementById('parcel-id').innerText = `${idToken.sub}`;
           document.getElementById('result').hidden = false
         } catch (error) {
           document.getElementById('result').hidden = true;
@@ -36,6 +34,6 @@
         }
       })()
     </script>
-    <!-- #endregion snippet-start -->
+    <!-- #endregion snippet-callback -->
   </body>
 </html>

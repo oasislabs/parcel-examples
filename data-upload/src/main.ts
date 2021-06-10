@@ -1,12 +1,12 @@
-import Parcel, { Document } from '@oasislabs/parcel';
+import Parcel, { AppId, Document } from '@oasislabs/parcel';
 
 import * as fs from 'fs';
 
-// #region snippet-configuration
-const apiCreds = {
-  // Client ID. Replace this with your service client ID, e.g. "C92EAFfH67w4bGkVMjihvkQ"
+// #region snippet-connect
+const parcel = new Parcel({
+  // Replace with your service client ID, e.g. "C92EAFfH67w4bGkVMjihvkQ"
   clientId: process.env.ACME_SERVICE_CLIENT_ID!,
-  // Client key
+  // Replace with the private key of your service client.
   privateKey: {
     use: 'sig',
     kty: 'EC',
@@ -16,11 +16,7 @@ const apiCreds = {
     y: 'e4Q4ygapmkxku_olSuc-WhSJaWiNCvuPqIWaOV6P9pE',
     d: '_X2VJCigbOYXOq0ilXATJdh9c2DdaSzZlxXVV6yuCXg',
   },
-} as const;
-// #endregion snippet-configuration
-
-// #region snippet-connect
-const parcel = new Parcel(apiCreds);
+});
 // #endregion snippet-connect
 
 // #region snippet-document-upload
@@ -28,8 +24,11 @@ const data = 'Hello private world!';
 const documentDetails = { title: 'My first document', tags: ['greeting', 'english'] };
 let document: Document;
 try {
-  document = await parcel.uploadDocument(data, { details: documentDetails, toApp: undefined })
-    .finished;
+  document = await parcel.uploadDocument(data, {
+    details: documentDetails,
+    // Replace with your app ID, e.g. "AXstH3HzQoEhESWzTqxup9d"
+    toApp: process.env.ACME_APP_ID! as AppId,
+  }).finished;
 } catch (error: any) {
   console.error('Failed to upload document');
   throw error;
@@ -37,6 +36,17 @@ try {
 
 console.log(`Created document ${document.id} with title ${document.details.title}`);
 // #endregion snippet-document-upload
+
+// #region snippet-document-search
+const uploadedDocuments = (
+  await parcel.searchDocuments({
+    selectedByCondition: { 'document.creator': { $eq: (await parcel.getCurrentIdentity()).id } },
+  })
+).results;
+for (const d of uploadedDocuments) {
+  console.log(`Found document ${d.id} named ${d.details.title}`);
+}
+// #endregion snippet-document-search
 
 // #region snippet-document-download
 // Let's download the above document using its ID.

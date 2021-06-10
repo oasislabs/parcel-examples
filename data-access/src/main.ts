@@ -1,8 +1,8 @@
 import Parcel, { AppId, IdentityId } from '@oasislabs/parcel';
 import fs from 'fs';
 
-// #region snippet-config
-const tokenSource = {
+// Connect to Acme's identity.
+const parcel = new Parcel({
   clientId: process.env.ACME_SERVICE_CLIENT_ID!,
   privateKey: {
     kid: 'acme-service-client',
@@ -14,21 +14,15 @@ const tokenSource = {
     y: 'e4Q4ygapmkxku_olSuc-WhSJaWiNCvuPqIWaOV6P9pE',
     d: '_X2VJCigbOYXOq0ilXATJdh9c2DdaSzZlxXVV6yuCXg',
   },
-} as const;
-// #endregion snippet-config
-
-// #region snippet-identity-acme-connect
-// Connect to ACME's identity.
-const parcel = new Parcel(tokenSource);
-// #endregion snippet-identity-acme-connect
+});
 
 // By default, documents are owned by the uploading identity
 // #region snippet-upload-default-owner
 const acmeIdentity = await parcel.getCurrentIdentity();
 console.log(`Uploading data with identity: ${acmeIdentity.id}`);
 
-const data = 'The weather will be sunny tomorrow and cloudy on Tuesday.';
-const documentDetails = { title: 'Weather forecast summary', tags: ['english'] };
+const data = 'Eggs and Emmentaler is the best!';
+const documentDetails = { title: 'Favorite sando', tags: ['lang:en'] };
 const acmeDocument = await parcel.uploadDocument(data, {
   details: documentDetails,
   toApp: undefined,
@@ -66,39 +60,72 @@ console.log(`Created document ${bobDocument.id} with owner ${bobDocument.owner}`
 download = parcel.downloadDocument(bobDocument.id);
 saver = fs.createWriteStream(`./bob_data_by_acme`);
 try {
-  console.log(`Attempting to access Bob's document without permission...`);
+  console.log(
+    `Attempting to access Bob's document using Acme's identity ${acmeIdentity.id} and without permission...`,
+  );
   await download.pipeTo(saver);
 } catch (error: any) {
-  console.log(`ACME was not able to access Bob's data (this was expected): ${error}`);
+  console.log(`Acme was not able to access Bob's data (this was expected): ${error}`);
 }
 // #endregion snippet-download-acme-error
 
-/**
- * At this point, we need Bob to grant us permission to use his data.
- * Specifically, we need to:
- *  - Redirect Bob to steward.oasislabs.com/apps/:id/join
- *  - Have Bob grant us permission
- */
+// At this point, we need Bob to grant the app permission to use his data.
+// #region snippet-create-grant
+console.log(
+  `Bob granting Acme app ${process.env.ACME_APP_ID} permission to access document ${bobDocument.id}...`,
+);
+const parcelBob = new Parcel({
+  clientId: process.env.BOB_SERVICE_CLIENT_ID!,
+  privateKey: {
+    kid: 'bob-service-client',
+    use: 'sig',
+    kty: 'EC',
+    crv: 'P-256',
+    alg: 'ES256',
+    x: 'kbhoJYKyOgY645Y9t-Vewwhke9ZRfLh6_TBevIA6SnQ',
+    y: 'SEu0xuCzTH95-q_-FSZc-P6hCSnq6qH00MQ52vOVVpA',
+    d: '10sS7lgM_YWxf79x21mWalCkAcZZOmX0ZRE_YwEXcmc',
+  },
+});
+await parcelBob.createGrant({
+  grantee: process.env.ACME_APP_ID! as AppId,
+  condition: { 'document.id': { $eq: bobDocument.id } },
+});
+// #endregion snippet-create-grant
 
 // Periodically check, if the access was granted.
-while (true) {
-  try {
-    // #region snippet-download-bob-success
-    console.log(`Attempting to access Bob's document with ACME identity ${acmeIdentity.id}`);
-    download = parcel.downloadDocument(bobDocument.id);
-    saver = fs.createWriteStream(`./bob_data_by_acme`);
-    await download.pipeTo(saver);
-    console.log(`Document ${bobDocument.id} has been downloaded to ./bob_data_by_acme`);
-    const bobData = fs.readFileSync('./bob_data_by_acme', 'utf-8');
-    console.log(`Here's the data: ${bobData}`);
-    // #endregion snippet-download-bob-success
-    break;
-  } catch {
-    console.log("No permission to access Bob's document yet. Retrying in 2s...");
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2000);
-    });
-  }
+// #region snippet-download-bob-success
+console.log(
+  `Attempting to access Bob's document using Acme's identity ${acmeIdentity.id} and with his permission...`,
+);
+download = parcel.downloadDocument(bobDocument.id);
+saver = fs.createWriteStream(`./bob_data_by_acme`);
+await download.pipeTo(saver);
+console.log(`Document ${bobDocument.id} has been downloaded to ./bob_data_by_acme`);
+const bobData = fs.readFileSync('./bob_data_by_acme', 'utf-8');
+console.log(`Here's the data: ${bobData}`);
+// #endregion snippet-download-bob-success
+
+// Print Bob's document access history.
+// #region snippet-document-history
+console.log(`Access log for document ${bobDocument.id}:`);
+for (const event of (await bobDocument.history()).results) {
+  console.log(`${event.accessor} accessed this document on ${event.createdAt.toISOString()}`);
 }
+// #endregion snippet-document-history
+
+// Perform another access and print the access history.
+// #region snippet-document-history-again
+console.log(`Downloading document ${bobDocument.id} again...`);
+download = parcel.downloadDocument(bobDocument.id);
+saver = fs.createWriteStream(`./bob_data_by_acme_again`);
+await download.pipeTo(saver);
+
+console.log(`Access log for document ${bobDocument.id}:`);
+for (const event of (await bobDocument.history()).results) {
+  console.log(`${event.accessor} accessed this document on ${event.createdAt.toISOString()}`);
+}
+
+// #endregion snippet-document-history-again
 
 console.log();

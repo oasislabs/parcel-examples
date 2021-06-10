@@ -66,7 +66,7 @@ try {
   console.log(`Attempting to access Bob's document without permission...`);
   await recipeDownload.pipeTo(recipeSaver);
 } catch (error: any) {
-  console.log(`ACME was not able to directly access Bob's data (this was expected): ${error}`);
+  console.log(`Acme was not able to directly access Bob's data (this was expected): ${error}`);
 }
 // #endregion snippet-failed-download
 

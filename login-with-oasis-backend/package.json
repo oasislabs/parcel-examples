@@ -1,22 +1,24 @@
 {
   "private": true,
-  "name": "@oasislabs/parcel-examples-login-with-oasis",
+  "name": "@oasislabs/parcel-examples-login-with-oasis-backend",
   "version": "1.0.0",
   "main": "./src/server.ts",
-  "description": "Oasis Parcel Login with Oasis example",
+  "description": "Oasis Parcel Login with Oasis example (backend)",
   "license": "MIT",
   "author": "Oasis Labs <feedback@oasislabs.com>",
   "type": "module",
   "engines": {
-    "node": ">=14.13"
+    "node": ">=14.8"
   },
   "scripts": {
     "prestart": "tsc -b",
     "start": "node bin/server.js"
   },
   "dependencies": {
-    "@oasislabs/parcel": "^1.0.0-beta.1",
-    "express": "^4.17.1"
+    "@oasislabs/parcel": "^1.0.0-beta.8",
+    "express": "^4.17.1",
+    "openid-client": "^4.6.0",
+    "pug": "^3.0.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",

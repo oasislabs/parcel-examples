@@ -1,9 +1,0 @@
-{
-    "extends": "../../tsconfig.json",
-    "include": ["."],
-    "compilerOptions": {
-        "noEmit": true,
-        "resolveJsonModule": true,
-        "skipLibCheck": true
-    }
-}

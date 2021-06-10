@@ -9,11 +9,11 @@ const PARCEL_AUTH_URL = process.env.PARCEL_AUTH_URL ?? 'https://auth.oasislabs.c
 
 const oidcConfig = {
   authority: PARCEL_AUTH_URL,
-  // Replace with your app's front-end client ID.
+  // Replace with your app's frontend client ID.
   client_id: process.env.ACME_FRONTEND_CLIENT_ID!,
   redirect_uri: `http://localhost:${port}/callback`,
   response_type: 'code',
-  scope: 'openid',
+  scope: 'openid profile email',
   filterProtocolClaims: false,
   loadUserInfo: false,
   extraQueryParams: {
@@ -36,9 +36,6 @@ app.get('/getOidcConfig', (req: express.Request, res: express.Response) => {
     .set('Content-Type', 'text/javascript')
     .send(`let oidcConfig = ${JSON.stringify(oidcConfig)};`);
 });
-
-// #region snippet-finalize-login
-// #endregion snippet-finalize-login
 
 app.listen(port, () => {
   console.log('Login with Oasis app listening at http://localhost:%s', port);

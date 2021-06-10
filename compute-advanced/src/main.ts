@@ -1,26 +1,13 @@
 import Parcel, { AppId, JobPhase, JobSpec, JobStatusReport } from '@oasislabs/parcel';
 import fs from 'fs';
 
-const acmeId = process.env.ACME_APP_ID! as AppId;
-const tokenSourceAcme = {
-  clientId: process.env.ACME_SERVICE_CLIENT_ID!,
-  privateKey: {
-    kid: 'acme-service-client',
-    use: 'sig',
-    kty: 'EC',
-    crv: 'P-256',
-    alg: 'ES256',
-    x: 'ej4slEdbZpwYG-4T-WfLHpMBWPf6FItNNGFEHsjdyK4',
-    y: 'e4Q4ygapmkxku_olSuc-WhSJaWiNCvuPqIWaOV6P9pE',
-    d: '_X2VJCigbOYXOq0ilXATJdh9c2DdaSzZlxXVV6yuCXg',
-  },
-} as const;
-
+// --- Upload data as Bob.
 // In a real-world scenario, these credentials would typically be used in a completely separate script
 // because no single entity has access to both Acme and Bob credentials.
 // This example script, however, performs actions both as Acme and Bob so that the flow is easier to
 // follow.
-const tokenSourceBob = {
+// #region snippet-input-documents
+const parcelBob = new Parcel({
   clientId: process.env.BOB_SERVICE_CLIENT_ID!,
   privateKey: {
     kid: 'bob-service-client',
@@ -32,10 +19,7 @@ const tokenSourceBob = {
     y: 'SEu0xuCzTH95-q_-FSZc-P6hCSnq6qH00MQ52vOVVpA',
     d: '10sS7lgM_YWxf79x21mWalCkAcZZOmX0ZRE_YwEXcmc',
   },
-} as const;
-
-// --- Upload data as Bob.
-const parcelBob = new Parcel(tokenSourceBob);
+});
 const bobId = (await parcelBob.getCurrentIdentity()).id;
 
 // Upload a documents and give Acme access to it.
@@ -45,7 +29,7 @@ const skinDocument = await parcelBob.uploadDocument(
   { details: { title: 'User-provided skin image' }, toApp: undefined },
 ).finished;
 await parcelBob.createGrant({
-  grantee: acmeId,
+  grantee: process.env.ACME_APP_ID! as AppId,
   condition: {
     $and: [
       { 'document.id': { $eq: skinDocument.id } },
@@ -69,7 +53,19 @@ const jobSpec: JobSpec = {
 
 // Submit the job.
 console.log('Running the job as Acme.');
-const parcelAcme = new Parcel(tokenSourceAcme);
+const parcelAcme = new Parcel({
+  clientId: process.env.ACME_SERVICE_CLIENT_ID!,
+  privateKey: {
+    kid: 'acme-service-client',
+    use: 'sig',
+    kty: 'EC',
+    crv: 'P-256',
+    alg: 'ES256',
+    x: 'ej4slEdbZpwYG-4T-WfLHpMBWPf6FItNNGFEHsjdyK4',
+    y: 'e4Q4ygapmkxku_olSuc-WhSJaWiNCvuPqIWaOV6P9pE',
+    d: '_X2VJCigbOYXOq0ilXATJdh9c2DdaSzZlxXVV6yuCXg',
+  },
+});
 const jobId = (await parcelAcme.submitJob(jobSpec)).id;
 
 // Wait for job completion.
