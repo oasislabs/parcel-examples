@@ -1,0 +1,5 @@
+# Example-specific generated files.
+random-100MB-upload
+random-100MB-download
+# Compiled javascript.
+bin/

@@ -15,7 +15,7 @@
     "start": "node bin/server.js"
   },
   "dependencies": {
-    "@oasislabs/parcel": "^1.0.0-beta.8",
+    "@oasislabs/parcel": "^1.0.0-beta.9",
     "express": "^4.17.1"
   },
   "devDependencies": {
