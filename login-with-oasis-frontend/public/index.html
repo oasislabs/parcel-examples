@@ -6,6 +6,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/gh/IdentityModel/oidc-client-js@1.10.1/dist/oidc-client.js"></script>
+    <!-- #region snippet-oidc-init -->
+    <script src="/getOidcConfig" type="text/javascript"></script>
+    <script>
+      function authRedirect() {
+        Oidc.Log.logger = console;
+        Oidc.Log.level = Oidc.Log.DEBUG;
+        console.log(oidcConfig)
+        const oidcClient = new Oidc.UserManager(oidcConfig);
+        oidcClient.signinRedirect();
+      }
+    </script>
+    <!-- #endregion snippet-oidc-init -->
     <link rel="stylesheet" type="text/css" href="style.css" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico" />
   </head>
@@ -23,7 +35,7 @@
           app.
         </p>
         <p>To set up your Oasis account, click Get Started</p>
-        <button onclick="oidcClient.signinRedirect()" data-cy="sign-up-oasis">
+        <button onclick="authRedirect()" data-cy="sign-up-oasis">
           Get started with Oasis
         </button>
       </div>
@@ -31,14 +43,5 @@
     <div class="footer">
       <p class="credit">Photo by Brooke Lark on Unsplash</p>
     </div>
-    <!-- #region snippet-oidc-init -->
-    <script src="/getOidcConfig" type="text/javascript"></script>
-    <script>
-      Oidc.Log.logger = console;
-      Oidc.Log.level = Oidc.Log.DEBUG;
-      console.log(oidcConfig)
-      const oidcClient = new Oidc.UserManager(oidcConfig);
-    </script>
-    <!-- #endregion snippet-oidc-init -->
   </body>
 </html>

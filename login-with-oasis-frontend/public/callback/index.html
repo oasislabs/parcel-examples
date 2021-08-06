@@ -2,18 +2,6 @@
 <html lang="en">
   <head>
     <script src="https://cdn.jsdelivr.net/gh/IdentityModel/oidc-client-js@1.10.1/dist/oidc-client.js"></script>
-  </head>
-  <body>
-    <div class="main">
-      <p>Verifying authorization token...</p>
-      <!-- #region snippet-display -->
-      <div id="result" hidden>
-        <span>Your Parcel identity is</span>
-        <button id="parcel-id" data-cy="parcel-id"></button>
-      </div>
-      <!-- #endregion snippet-display -->
-      <div id="error"></div>
-    </div>
     <!-- #region snippet-callback -->
     <script src="/getOidcConfig" type="text/javascript"></script>
     <script>
@@ -35,5 +23,17 @@
       })()
     </script>
     <!-- #endregion snippet-callback -->
+  </head>
+  <body>
+    <div class="main">
+      <p>Verifying authorization token...</p>
+      <!-- #region snippet-display -->
+      <div id="result" hidden>
+        <span>Your Parcel identity is</span>
+        <button id="parcel-id" data-cy="parcel-id"></button>
+      </div>
+      <!-- #endregion snippet-display -->
+      <div id="error"></div>
+    </div>
   </body>
 </html>
