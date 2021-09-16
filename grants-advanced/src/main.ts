@@ -1,5 +1,6 @@
-import Parcel, { AppId, JobSpec, JobStatusReport, JobPhase } from '@oasislabs/parcel';
 import fs from 'fs';
+
+import Parcel, { AppId, JobSpec, JobStatusReport, JobPhase } from '@oasislabs/parcel';
 
 // #region snippet-configuration
 const acmeId = process.env.ACME_APP_ID! as AppId;

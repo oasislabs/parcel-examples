@@ -8,14 +8,14 @@
   "author": "Oasis Labs <feedback@oasislabs.com>",
   "type": "module",
   "engines": {
-    "node": ">=14.8"
+    "node": "^14.0"
   },
   "scripts": {
     "prestart": "tsc -b",
     "start": "node bin/server.js"
   },
   "dependencies": {
-    "@oasislabs/parcel": "^1.0.0-beta.11",
+    "@oasislabs/parcel": "^1.0.0-beta.13",
     "express": "^4.17.1",
     "openid-client": "^4.6.0",
     "pug": "^3.0.2"

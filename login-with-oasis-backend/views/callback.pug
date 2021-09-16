@@ -8,5 +8,10 @@ html
         div(class='main')
             p Verifying authorization token...
             div(id='result')
-                span Your Parcel identity is&nbsp;
-                button(id='parcel-id', data-cy='parcel-id') #{parcelId}
+                p
+                    span Your Parcel identity is&nbsp;
+                    button(id='parcel-id', data-cy='parcel-id') #{parcelId}
+                p
+                    span You have&nbsp;
+                    span(id='document-count', data-cy='document-count') #{documentCount}
+                    span &nbsp;documents!

@@ -4,23 +4,29 @@
     <script src="https://cdn.jsdelivr.net/gh/IdentityModel/oidc-client-js@1.10.1/dist/oidc-client.js"></script>
     <!-- #region snippet-callback -->
     <script src="/getOidcConfig" type="text/javascript"></script>
+    <script src="/parcel.js"></script>
     <script>
       Oidc.Log.logger = console;
       Oidc.Log.level = Oidc.Log.DEBUG;
       const oidcClient = new Oidc.OidcClient(oidcConfig);
       (async function () {
-        try {
-          const response = await oidcClient.processSigninResponse(location.href)
-          const idToken = response.profile;
-          console.log(`ID token:\n${JSON.stringify(idToken)}`);
+        const response = await oidcClient.processSigninResponse(location.href);
+        const idToken = response.profile;
+        document.querySelector('#parcel-id').textContent = `${idToken.sub}`;
 
-          document.getElementById('parcel-id').innerText = `${idToken.sub}`;
-          document.getElementById('result').hidden = false
-        } catch (error) {
-          document.getElementById('result').hidden = true;
-          document.getElementById('error').innerText = `${error}`;
-        }
-      })()
+        // Use Parcel API to count the number of owned documents.
+        const parcel = new Parcel(response.access_token);
+        const { results } = await parcel.searchDocuments({
+          selectedByCondition: {
+            'document.owner': {
+              $eq: idToken.sub,
+            },
+          },
+        });
+        document.querySelector('#document-count').textContent = `${results.length}`;
+
+        document.querySelector('#result').hidden = false;
+      })();
     </script>
     <!-- #endregion snippet-callback -->
   </head>
@@ -29,8 +35,15 @@
       <p>Verifying authorization token...</p>
       <!-- #region snippet-display -->
       <div id="result" hidden>
-        <span>Your Parcel identity is</span>
-        <button id="parcel-id" data-cy="parcel-id"></button>
+        <p>
+          <span>Your Parcel identity is</span>
+          <button id="parcel-id" data-cy="parcel-id"></button>
+        </p>
+        <p>
+          <span>You have</span>
+          <span id="document-count" data-cy="document-count"></span>
+          <span>documents!</span>
+        </p>
       </div>
       <!-- #endregion snippet-display -->
       <div id="error"></div>

@@ -1,5 +1,6 @@
-import Parcel, { AppId, IdentityId } from '@oasislabs/parcel';
 import fs from 'fs';
+
+import Parcel, { AppId, IdentityId } from '@oasislabs/parcel';
 
 // Connect to Acme's identity.
 const parcel = new Parcel({

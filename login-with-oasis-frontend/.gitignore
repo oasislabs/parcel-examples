@@ -1,2 +1,5 @@
 # Compiled javascript.
 bin/
+# parcel-bundler generated files
+public/parcel.js
+public/parcel.js.map

@@ -1,6 +1,6 @@
-import Parcel, { AppId, Document } from '@oasislabs/parcel';
-
 import * as fs from 'fs';
+
+import Parcel, { AppId, Document } from '@oasislabs/parcel';
 
 // #region snippet-connect
 const parcel = new Parcel({

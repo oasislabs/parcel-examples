@@ -1,5 +1,6 @@
-import Parcel, { AppId, JobPhase, JobSpec, JobStatusReport } from '@oasislabs/parcel';
 import fs from 'fs';
+
+import Parcel, { AppId, JobPhase, JobSpec, JobStatusReport } from '@oasislabs/parcel';
 
 // --- Upload data as Bob.
 // In a real-world scenario, these credentials would typically be used in a completely separate script
@@ -48,6 +49,7 @@ const jobSpec: JobSpec = {
   inputDocuments: [{ mountPath: 'skin.jpg', id: skinDocument.id }],
   outputDocuments: [{ mountPath: 'prediction.txt', owner: bobId }],
   cmd: ['python', 'predict.py', '/parcel/data/in/skin.jpg', '/parcel/data/out/prediction.txt'],
+  memory: '2G',
 };
 // #endregion snippet-submit-job
 

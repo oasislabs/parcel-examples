@@ -1,5 +1,6 @@
-import Parcel, { AppId, JobSpec, JobStatusReport, JobPhase } from '@oasislabs/parcel';
 import fs from 'fs';
+
+import Parcel, { AppId, JobSpec, JobStatusReport, JobPhase } from '@oasislabs/parcel';
 
 // --- Upload data as Bob.
 // In a real-world scenario, these credentials would typically be used in a completely separate script

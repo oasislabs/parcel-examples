@@ -1,5 +1,7 @@
 import express from 'express';
-import { Issuer, generators } from 'openid-client';
+import { generators, Issuer } from 'openid-client';
+
+import Parcel, { IdentityId } from '@oasislabs/parcel';
 
 // #region snippet-openid-client-config
 // Configure OpenID Connect client.
@@ -54,7 +56,7 @@ const port = 4050;
 app.get('/', (req: express.Request, res: express.Response) => {
   // Obtain authorization URL.
   const authorizationUrl = client.authorizationUrl({
-    scope: 'openid profile email',
+    scope: 'openid profile email parcel.public',
     audience: 'https://api.oasislabs.com/parcel',
     state,
     nonce,
@@ -68,7 +70,7 @@ app.get('/', (req: express.Request, res: express.Response) => {
 // #endregion snippet-initialize-login
 
 app.get('/callback', async (req: express.Request, res: express.Response) => {
-  // #region snippet-finalize-login-callback
+  // #region snippet-login-callback
   const callbackParams = client.callbackParams(req.url);
 
   // Exchange code for tokens.
@@ -87,17 +89,28 @@ app.get('/callback', async (req: express.Request, res: express.Response) => {
       },
     },
   );
-  // #endregion snippet-finalize-login-callback
+  // #endregion snippet-login-callback
 
-  // #region snippet-finalize-login-extract-claims
+  /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+  // #region snippet-create-parcel-instance
   const idToken = tokenSet.claims();
 
-  console.log(`ID token:\n${JSON.stringify(idToken)}`);
+  // Use Parcel API to count the number of owned documents.
+  const parcel = new Parcel(tokenSet.access_token!);
+  const { results } = await parcel.searchDocuments({
+    selectedByCondition: {
+      'document.owner': {
+        $eq: idToken.sub as IdentityId,
+      },
+    },
+  });
 
   res.render('callback', {
     parcelId: idToken.sub,
+    documentCount: results.length,
   });
-  // #endregion snippet-finalize-login-extract-claims
+  // #endregion snippet-create-parcel-instance
+  /* eslint-enable @typescript-eslint/no-unnecessary-type-assertion */
 });
 
 app.listen(port, () => {

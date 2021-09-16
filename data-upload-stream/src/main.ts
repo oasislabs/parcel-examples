@@ -1,7 +1,7 @@
-import Parcel, { AppId } from '@oasislabs/parcel';
-
-import * as fs from 'fs';
+import fs from 'fs';
 import crypto from 'crypto';
+
+import Parcel, { AppId } from '@oasislabs/parcel';
 
 // Prefix of the file we randomly generate, upload and download back.
 const filename = 'random-100MB';

@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "@oasislabs/parcel-examples-compute-basic",
+  "name": "@oasislabs/parcel-examples-tokenization-basic",
   "version": "1.0.0",
   "main": "./src/main.ts",
-  "description": "Oasis Parcel Compute basic example",
+  "description": "Oasis Labs basic tokenization example",
   "license": "MIT",
   "author": "Oasis Labs <feedback@oasislabs.com>",
   "type": "module",
@@ -18,6 +18,6 @@
     "@oasislabs/parcel": "^1.0.0-beta.13"
   },
   "devDependencies": {
-    "typescript": "^4.1.2"
+    "typescript": "^4.3.5"
   }
 }
