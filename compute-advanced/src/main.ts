@@ -71,22 +71,27 @@ const parcelAcme = new Parcel({
 const jobId = (await parcelAcme.submitJob(jobSpec)).id;
 
 // Wait for job completion.
-let job: JobStatusReport;
+let jobReport: JobStatusReport;
 do {
   await new Promise((resolve) => setTimeout(resolve, 5000)); // eslint-disable-line no-promise-executor-return
-  job = await parcelAcme.getJobStatus(jobId);
-  console.log(`Job status is ${JSON.stringify(job.status)}`);
-} while (job.status.phase === JobPhase.PENDING || job.status.phase === JobPhase.RUNNING);
+  jobReport = await parcelAcme.getJobStatus(jobId);
+  console.log(`Job status is ${JSON.stringify(jobReport.status)}`);
+} while (
+  jobReport.status.phase === JobPhase.PENDING ||
+  jobReport.status.phase === JobPhase.RUNNING
+);
+
+const job = await parcelAcme.getJob(jobId);
 
 console.log(
-  `Job ${jobId} completed with status ${job.status.phase} and ${job.status.outputDocuments.length} output document(s).`,
+  `Job ${jobId} completed with status ${job.status?.phase} and ${job.io.outputDocuments.length} output document(s).`,
 );
 
 // Obtain compute job output -- again as Bob, because the computation was confidential and Acme
 // does not have access to the output data.
 // #region snippet-job-output
 console.log('Downloading output document as Bob.');
-const download = parcelBob.downloadDocument(job.status.outputDocuments[0].id);
+const download = parcelBob.downloadDocument(job.io.outputDocuments[0].id);
 const saver = fs.createWriteStream(`/tmp/output_document`);
 await download.pipeTo(saver);
 const output = fs.readFileSync('/tmp/output_document', 'utf-8');

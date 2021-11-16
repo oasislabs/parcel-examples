@@ -15,7 +15,7 @@
     "start": "node bin/server.js"
   },
   "dependencies": {
-    "@oasislabs/parcel": "^1.0.0-beta.13",
+    "@oasislabs/parcel": "^1.0.0-beta.14",
     "express": "^4.17.1",
     "openid-client": "^4.6.0",
     "pug": "^3.0.2"

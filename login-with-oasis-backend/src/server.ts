@@ -1,7 +1,7 @@
 import express from 'express';
 import { generators, Issuer } from 'openid-client';
 
-import Parcel, { IdentityId } from '@oasislabs/parcel';
+import Parcel from '@oasislabs/parcel';
 
 // #region snippet-openid-client-config
 // Configure OpenID Connect client.
@@ -91,26 +91,23 @@ app.get('/callback', async (req: express.Request, res: express.Response) => {
   );
   // #endregion snippet-login-callback
 
-  /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
   // #region snippet-create-parcel-instance
-  const idToken = tokenSet.claims();
-
   // Use Parcel API to count the number of owned documents.
   const parcel = new Parcel(tokenSet.access_token!);
+  const parcelId = (await parcel.getCurrentIdentity()).id;
   const { results } = await parcel.searchDocuments({
     selectedByCondition: {
       'document.owner': {
-        $eq: idToken.sub as IdentityId,
+        $eq: parcelId,
       },
     },
   });
 
   res.render('callback', {
-    parcelId: idToken.sub,
+    parcelId,
     documentCount: results.length,
   });
   // #endregion snippet-create-parcel-instance
-  /* eslint-enable @typescript-eslint/no-unnecessary-type-assertion */
 });
 
 app.listen(port, () => {

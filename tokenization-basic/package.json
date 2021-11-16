@@ -15,7 +15,7 @@
     "start": "node bin/main.js"
   },
   "dependencies": {
-    "@oasislabs/parcel": "^1.0.0-beta.13"
+    "@oasislabs/parcel": "^1.0.0-beta.14"
   },
   "devDependencies": {
     "typescript": "^4.3.5"
