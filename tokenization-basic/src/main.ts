@@ -24,7 +24,12 @@ const artToken = await parcelBob.mintToken({
   grant: {
     condition: null, // Allow full access to anyone holding the token.
   },
-  supply: 1, // It's an NFT.
+  transferability: {
+    // The token is transferable on Parcel (and not bridged anywhere).
+    parcel: {
+      supply: 1, // It's an NFT.
+    },
+  },
 });
 console.log('The art token is:', artToken);
 // #endregion snippet-mint-token
