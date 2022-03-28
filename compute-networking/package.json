@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "@oasislabs/parcel-examples-data-upload",
+  "name": "@oasislabs/parcel-examples-compute-networking",
   "version": "1.0.0",
   "main": "./src/main.ts",
-  "description": "Oasis Parcel Data upload example",
+  "description": "Oasis Parcel Compute networking example",
   "license": "MIT",
   "author": "Oasis Labs <feedback@oasislabs.com>",
   "type": "module",
