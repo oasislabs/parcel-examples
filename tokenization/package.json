@@ -16,8 +16,8 @@
     "start": "node bin/src/main.js"
   },
   "dependencies": {
-    "@oasislabs/parcel": "^1.0.0-beta.20",
-    "@oasislabs/parcel-evm-contracts": "^1.0.0",
+    "@oasislabs/parcel": "^1.0.0-beta.21",
+    "@oasislabs/parcel-evm-contracts": "^2.0.1",
     "ethers": "^5.5.3"
   },
   "devDependencies": {

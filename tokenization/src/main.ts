@@ -114,6 +114,7 @@ await acmeIdentity.linkEthAddr(acmeWallet);
 
 // Now Acme invokes the Emerald Parcel bridge adapter to lock the Emerald token
 // in exchange for a Parcel token.
+const bridgeAdapter = await EmeraldBridgeAdapterV1.connect(acmeWallet);
 
 // Connect to the token contract using the `typechain-ethers` generated bindings.
 const tokenContract = ERC721__factory.connect(nftAddress, acmeWallet);
@@ -122,7 +123,7 @@ const safeTransferFrom = tokenContract['safeTransferFrom(address,address,uint256
 // Transfer the token's ownership to the Parcel Bridge Adapter. Locked tokens can be withdrawn
 // at any time using the `unlockERC{20,721,1155}` methods.
 console.log('locking NFT into Parcel Emerald bridge adapter');
-await safeTransferFrom(acmeWallet.address, EmeraldBridgeAdapterV1.address, nftTokenId, []);
+await safeTransferFrom(acmeWallet.address, bridgeAdapter.address, nftTokenId, []);
 
 // Wait a little while for the bridge to pick up and execute the lock event.
 await new Promise((resolve) => {
@@ -142,7 +143,6 @@ assert.strictEqual(Buffer.concat(artChunks).toString(), artContents);
 
 // #region snippet-unlock-token
 // And finally unlock the token for trading once again.
-const bridgeAdapter = EmeraldBridgeAdapterV1.connect(acmeWallet);
 console.log('unlocking NFT from bridge adapter');
 await bridgeAdapter.unlockERC721(acmeWallet.address, nftAddress, nftTokenId, []);
 // #endregion snippet-unlock-token
